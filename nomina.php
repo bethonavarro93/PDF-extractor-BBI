@@ -6,10 +6,10 @@ require 'vendor/autoload.php';
 # CARGA LA LIBRERÍA DE PDFPARSER
 $parser = new \Smalot\PdfParser\Parser();
 
-# PHPMAILER LIBRERÍA
+# CARGA LA LIBRERÍA DE PHPMAILER
 use PHPMailer\PHPMailer\PHPMailer;
 
-# PATRÓN DE BÚSQUEDA
+# PATRÓN DE BÚSQUEDA DE CORREO ELECTRÓNICO
 $pattern = '/[a-z\d._%+-]+@[a-z\d.-]+\.[a-z]{2,4}\b/i';
 
 # RUTA DONDE SE ENCUENTRAN LOS ARCHIVOS PDF A PROCESAR

@@ -185,7 +185,7 @@ class Parser
                             '/(\d+\s+\d+\s*)/s',
                             $match[1],
                             -1,
-                          \PREG_SPLIT_NO_EMPTY | \PREG_SPLIT_DELIM_CAPTURE
+                            \PREG_SPLIT_NO_EMPTY | \PREG_SPLIT_DELIM_CAPTURE
                         );
                         $table = [];
 
@@ -200,7 +200,7 @@ class Parser
                         $positions = array_keys($table);
 
                         foreach ($positions as $index => $position) {
-                            $id = $ids[$index].'_0';
+                            $id = $ids[$index] . '_0';
                             $next_position = isset($positions[$index + 1]) ? $positions[$index + 1] : \strlen($content);
                             $sub_content = substr($content, $position, (int) $next_position - (int) $position);
 
@@ -278,17 +278,17 @@ class Parser
                 return new ElementNull();
 
             case '(':
-                if ($date = ElementDate::parse('('.$value.')', $document)) {
+                if ($date = ElementDate::parse('(' . $value . ')', $document)) {
                     return $date;
                 }
 
-                return ElementString::parse('('.$value.')', $document);
+                return ElementString::parse('(' . $value . ')', $document);
 
             case '<':
                 return $this->parseHeaderElement('(', ElementHexa::decode($value), $document);
 
             case '/':
-                return ElementName::parse('/'.$value, $document);
+                return ElementName::parse('/' . $value, $document);
 
             case 'ojbref': // old mistake in tcpdf parser
             case 'objref':
@@ -314,7 +314,7 @@ class Parser
                 return null;
 
             default:
-                throw new \Exception('Invalid type: "'.$type.'".');
+                throw new \Exception('Invalid type: "' . $type . '".');
         }
     }
 }

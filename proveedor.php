@@ -6,11 +6,11 @@ require 'vendor/autoload.php';
 # CARGA LA LIBRERÍA DE PDFPARSER
 $parser = new \Smalot\PdfParser\Parser();
 
-# PHPMAILER LIBRERÍA
+# CARGA LA LIBRERÍA DE PHPMAILER
 use PHPMailer\PHPMailer\PHPMailer;
 
-# PATRÓN DE BÚSQUEDA
-$pattern = '/[a-z\d._%+-]+@[a-z\d.-]+\.[a-z]{2,4}\b/i';
+# PATRÓN DE BÚSQUEDA PARA TELEFONO FIJO EN COLOMBIA
+$pattern = '/^(?:\+?57)?[\s-]*(?:[2-7][0-9]{7})$/';
 
 # RUTA DONDE SE ENCUENTRAN LOS ARCHIVOS PDF A PROCESAR
 $url_route_in_process = "./En_proceso/";
@@ -22,7 +22,7 @@ $url_route_sent = "./Success/";
 $extension = ".pdf";
 
 # CONTEO DE CADA PROCESO
-$conteo = 0;
+$conteo = 1;
 
 # ABRIENDO EL DIRECTORIO
 $directory = opendir($url_route_in_process);
@@ -47,7 +47,6 @@ while ($archivo = readdir($directory)) {
 
         echo "[2.] Obtiene datos del archivo $archivo ..." . "\n";
 
-
         # BUSCAR EL CORREO EN EL TEXTO DEL PDF Y GUARDARLO EN UNA VARIABLE $matches
         preg_match($pattern, $text, $matches);
 
@@ -67,10 +66,9 @@ while ($archivo = readdir($directory)) {
 
         echo "[5.] Renombrando archivo $archivo por $matches[0] ..." . "\n";
 
-
         # ENVIAR CORREO ELECTRÓNICO CON EL PDF PROCESADO
 
-        # INSTANCIAR LA CLASE PHPMailer
+        # INSTANCIA LA CLASE PHPMailer
         $mail = new PHPMailer;
 
         # CONFIGURAR EL SERVIDOR DE CORREO
