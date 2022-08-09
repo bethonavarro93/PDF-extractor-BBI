@@ -2,6 +2,7 @@
 
 # VENDOR AUTOLOAD
 require 'vendor/autoload.php';
+require 'conn.php';
 
 # CARGA LA LIBRERÍA DE PDFPARSER
 $parser = new \Smalot\PdfParser\Parser();
@@ -10,7 +11,8 @@ $parser = new \Smalot\PdfParser\Parser();
 use PHPMailer\PHPMailer\PHPMailer;
 
 # PATRÓN DE BÚSQUEDA DE CORREO ELECTRÓNICO
-$pattern = '/[a-z\d._%+-]+@[a-z\d.-]+\.[a-z]{2,4}\b/i';
+// $pattern = '/[a-z\d._%+-]+@[a-z\d.-]+\.[a-z]{2,4}\b/i';
+$pattern = '/[a-z\d._%+-]+@[a-z\d.-]+[a-z]{2,4}/i';
 
 # RUTA DONDE SE ENCUENTRAN LOS ARCHIVOS PDF A PROCESAR
 $url_route_in_process = "./En_proceso_proveedores/";
@@ -62,10 +64,18 @@ while ($archivo = readdir($directory)) {
         # IMPRIME LA DATA DEL ARCHIVO
         #var_dump($subject);
 
-        # RENOMBRAR CADA ARCHIVO PDF CON EL CORREO ENCONTRADO
-        rename($url_route_in_process . $archivo, $url_route_sent . $matches[0] . $extension);
+        echo "<br>[5.] Extrayendo datos desde la base de datos ..." . "\n";
 
-        echo "<br>[5.] Renombrando archivo $archivo por $matches[0] ..." . "\n";
+        $sql_data = get_email($matches[0]);
+
+        $email_sql = $sql_data[0]['mail'];
+
+        echo "<br>[6.] Correo $email_sql identificado ..." . "\n";
+
+        # RENOMBRAR CADA ARCHIVO PDF CON EL CORREO ENCONTRADO
+        rename($url_route_in_process . $archivo, $url_route_sent . $email_sql . $extension);
+
+        echo "<br>[7.] Renombrando archivo $archivo por $email_sql ..." . "\n";
 
 
         # ENVIAR CORREO ELECTRÓNICO CON EL PDF PROCESADO
@@ -83,11 +93,11 @@ while ($archivo = readdir($directory)) {
         $mail->SMTPAuth = true;
 
         # CONFIGURAR EL USUARIO DE CORREO
-        $mail->Username = 'nomina@bbi.com.co';
+        $mail->Username = 'notificaciones.pagos@bbi.com.co';
 
         # CONFIGURAR LA CONTRASEÑA DE CORREO
         // $mail->Password = 'BBI2022*';
-        $mail->Password = 'xrzf uaqi xfir quiq';
+        $mail->Password = 'wnnjutcnsrjegbid';
 
         # CONFIGURA LA SEGURIDAD TLS
         $mail->SMTPSecure = 'tls';
@@ -96,11 +106,11 @@ while ($archivo = readdir($directory)) {
         $mail->Port = 587;
 
         # CONFIGURAR EL CORREO DE ENVIÓ
-        $mail->setFrom('nomina@bbi.com.co', 'Nomina BBI');
+        $mail->setFrom('notificaciones.pagos@bbi.com.co', 'Notificaciones de pagos BBI');
 
         # CONFIGURAR EL CORREO DE RECEPCIÓN
-        // $mail->addAddress($matches[0]);
-        $mail->addAddress('alberto.navarro@bbi.com.co');
+        $mail->addAddress($email_sql);
+        // $mail->addAddress('alberto.navarro@bbi.com.co');
 
         # configurar copia de correo
         // $mail->addCC('esleydergranados@hotmail.com');
@@ -108,24 +118,24 @@ while ($archivo = readdir($directory)) {
         // $mail->addCC('ivan.rincon@bbi.com.co');
 
         # configurar copia oculta de correo
-        $mail->addBCC('nomina@bbi.com.co');
+        $mail->addBCC('notificaciones.pagos@bbi.com.co');
 
         # VALIDA SI ES HTML
         $mail->isHTML(false);
 
         # CONFIGURAR EL ASUNTO DEL CORREO con mes y año actual
-        $mail->Subject = 'Comprobante pago de Nomina Julio de 2022';
+        $mail->Subject = 'Notificaciones de pagos BBI';
 
         # CONFIGURAR EL CUERPO DEL CORREO
-        $mail->Body = 'Comprobante pago de Nomina Julio de 2022';
+        $mail->Body = 'Notificaciones de pagos BBI';
 
         # CONFIGURAR EL ARCHIVO ADJUNTO
-        $mail->addAttachment($url_route_sent . $matches[0] . $extension);
+        $mail->addAttachment($url_route_sent . $email_sql . $extension);
 
         # ENVIAR EL CORREO
         $mail->send();
 
-        echo "<br><br>[6.] Mail enviado al correo $matches[0] ..." . "\n\n";
+        echo "<br><br>[8.] Mail enviado al correo $email_sql ..." . "\n\n";
 
         echo "<br><br><br>PROCESO TERMINADO" . "\n\n\n";
 
