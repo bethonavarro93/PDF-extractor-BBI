@@ -31,12 +31,12 @@ echo "<br><br><br>INICIANDO DEL PROGRAMA..." . "\n\n\n";
 
 # RECORRIENDO EL DIRECTORIO PARA OBTENER LOS ARCHIVOS
 while ($archivo = readdir($directory)) {
-    
+
     # COMPROBAR QUE EL ARCHIVO NO SEA UN DIRECTORIO
     if ($archivo != '.' && $archivo != '..') {
-        
-        echo "<br>PROCESO #" . $conteo ++ . "\n";
-        
+
+        echo "<br>PROCESO #" . $conteo++ . "\n";
+
         # LEER EL ARCHIVO
         $pdf = $parser->parseFile($url_route_in_process . $archivo);
 
@@ -51,86 +51,95 @@ while ($archivo = readdir($directory)) {
         # BUSCAR EL CORREO EN EL TEXTO DEL PDF Y GUARDARLO EN UNA VARIABLE $matches
         preg_match($pattern, $text, $matches);
 
-        echo "<br>[3.] Identificando  $matches[0] ..." . "\n";
+        echo $matches[0];
 
-        # IMPRIMIR EL CORREO EN PANTALLA
-        echo "<br>[4.] Correo  $matches[0] identificado ..." . "\n";
+        if ($matches[0] == NULL) {
 
-        # EXTRACTAR EL NOMBRE DEL ARCHIVO
-        #$subject = explode(" ", $text);
+            // crear archivo de error log
+            $logFile = fopen("log_nomina.log", 'a+') or die("Error creando archivo");
+            fwrite($logFile, "\n\n\n" . date("d/m/Y H:i:s") . " El PDF $archivo no se pudo enviar por el error ") or die("Error escribiendo en el archivo");
+            fclose($logFile);
+        } else {
 
-        # IMPRIME LA DATA DEL ARCHIVO
-        #var_dump($subject);
+            echo "<br>[3.] Identificando  $matches[0] ..." . "\n";
 
-        # RENOMBRAR CADA ARCHIVO PDF CON EL CORREO ENCONTRADO
-        rename($url_route_in_process . $archivo, $url_route_sent . $matches[0] . $extension);
+            # IMPRIMIR EL CORREO EN PANTALLA
+            echo "<br>[4.] Correo  $matches[0] identificado ..." . "\n";
 
-        echo "<br>[5.] Renombrando archivo $archivo por $matches[0] ..." . "\n";
+            # EXTRACTAR EL NOMBRE DEL ARCHIVO
+            #$subject = explode(" ", $text);
+
+            # IMPRIME LA DATA DEL ARCHIVO
+            #var_dump($subject);
+
+            # RENOMBRAR CADA ARCHIVO PDF CON EL CORREO ENCONTRADO
+            rename($url_route_in_process . $archivo, $url_route_sent . $matches[0] . $extension);
+
+            echo "<br>[5.] Renombrando archivo $archivo por $matches[0] ..." . "\n";
 
 
-        # ENVIAR CORREO ELECTRÓNICO CON EL PDF PROCESADO
+            # ENVIAR CORREO ELECTRÓNICO CON EL PDF PROCESADO
 
-        # INSTANCIA LA CLASE PHPMailer
-        $mail = new PHPMailer;
+            # INSTANCIA LA CLASE PHPMailer
+            $mail = new PHPMailer;
 
-        # CONFIGURAR EL SERVIDOR DE CORREO
-        $mail->isSMTP();
+            # CONFIGURAR EL SERVIDOR DE CORREO
+            $mail->isSMTP();
 
-        # CONFIGURAR EL SERVIDOR DE CORREO
-        $mail->Host = 'smtp.gmail.com';
+            # CONFIGURAR EL SERVIDOR DE CORREO
+            $mail->Host = 'smtp.gmail.com';
 
-        # CONFIGURA LA  AUTENTICACIÓN SMTP
-        $mail->SMTPAuth = true;
+            # CONFIGURA LA  AUTENTICACIÓN SMTP
+            $mail->SMTPAuth = true;
 
-        # CONFIGURAR EL USUARIO DE CORREO
-        $mail->Username = 'nomina@bbi.com.co';
+            # CONFIGURAR EL USUARIO DE CORREO
+            $mail->Username = 'nomina@bbi.com.co';
 
-        # CONFIGURAR LA CONTRASEÑA DE CORREO
-        // $mail->Password = 'BBI2022*';
-        $mail->Password = 'xrzf uaqi xfir quiq';
+            # CONFIGURAR LA CONTRASEÑA DE CORREO
+            // $mail->Password = 'BBI2022*';
+            $mail->Password = 'xrzf uaqi xfir quiq';
 
-        # CONFIGURA LA SEGURIDAD TLS
-        $mail->SMTPSecure = 'tls';
+            # CONFIGURA LA SEGURIDAD TLS
+            $mail->SMTPSecure = 'tls';
 
-        # CONFIGURAR EL PORT SMTP
-        $mail->Port = 587;
+            # CONFIGURAR EL PORT SMTP
+            $mail->Port = 587;
 
-        # CONFIGURAR EL CORREO DE ENVIÓ
-        $mail->setFrom('nomina@bbi.com.co', 'Nomina BBI');
+            # CONFIGURAR EL CORREO DE ENVIÓ
+            $mail->setFrom('nomina@bbi.com.co', 'Nomina BBI');
 
-        # CONFIGURAR EL CORREO DE RECEPCIÓN
-        $mail->addAddress($matches[0]);
-        // $mail->addAddress('alberto.navarro@bbi.com.co');
+            # CONFIGURAR EL CORREO DE RECEPCIÓN
+            //$mail->addAddress($matches[0]);
+            $mail->addAddress('alberto.navarro@bbi.com.co');
 
-        # configurar copia de correo
-        // $mail->addCC('esleydergranados@hotmail.com');
-        // $mail->addCC('btho.navarro93@gmail.com');
-        // $mail->addCC('ivan.rincon@bbi.com.co');
+            # configurar copia de correo
+            // $mail->addCC('esleydergranados@hotmail.com');
+            // $mail->addCC('btho.navarro93@gmail.com');
+            // $mail->addCC('ivan.rincon@bbi.com.co');
 
-        # configurar copia oculta de correo
-        $mail->addBCC('nomina@bbi.com.co');
+            # configurar copia oculta de correo
+            $mail->addBCC('nomina@bbi.com.co');
 
-        # VALIDA SI ES HTML
-        $mail->isHTML(false);
+            # VALIDA SI ES HTML
+            $mail->isHTML(false);
 
-        # CONFIGURAR EL ASUNTO DEL CORREO con mes y año actual
-        $mail->Subject = 'Comprobante pago de Nomina Julio de 2022';
+            # CONFIGURAR EL ASUNTO DEL CORREO con mes y año actual
+            $mail->Subject = 'Comprobante pago de Nomina Julio de 2022';
 
-        # CONFIGURAR EL CUERPO DEL CORREO
-        $mail->Body = 'Comprobante pago de Nomina Julio de 2022';
+            # CONFIGURAR EL CUERPO DEL CORREO
+            $mail->Body = 'Comprobante pago de Nomina Julio de 2022';
 
-        # CONFIGURAR EL ARCHIVO ADJUNTO
-        $mail->addAttachment($url_route_sent . $matches[0] . $extension);
+            # CONFIGURAR EL ARCHIVO ADJUNTO
+            $mail->addAttachment($url_route_sent . $matches[0] . $extension);
 
-        # ENVIAR EL CORREO
-        $mail->send();
+            # ENVIAR EL CORREO
+            $mail->send();
 
-        echo "<br>[6.] Mail enviado al correo $matches[0] ..." . "\n\n";
+            echo "<br>[6.] Mail enviado al correo $matches[0] ..." . "\n\n";
 
-        echo "<br><br><br>PROCESO TERMINADO" . "\n\n\n";
-
+            echo "<br><br><br>PROCESO TERMINADO" . "\n\n\n";
+        }
     }
 }
 
 echo "<br><br><br>PROGRAMA TERMINADO" . "\n\n\n";
-
