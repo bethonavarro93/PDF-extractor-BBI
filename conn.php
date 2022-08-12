@@ -24,6 +24,18 @@ function get_email($email_like)
     }
 
     # CONSULTA SQL SERVER
+
+
+    // $sql = "DECLARE @VAR NVARCHAR(MAX)=(SELECT top 1
+    //      f015_email AS mail
+    //     FROM UnoEE.dbo.[t015_mm_contactos] 
+    //     WHERE f015_email like'%$email_like%') 
+    
+    // SELECT top 1 * FROM Split(@VAR,';')
+    // SELECT top 1 * FROM consultas.dbo.Split(@VAR,';')
+    // ";
+
+    
     $sql = "SELECT DISTINCT f015_email AS mail FROM [dbo].[t015_mm_contactos] WHERE f015_email like'%$email_like%'";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
